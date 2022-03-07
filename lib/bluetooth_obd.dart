@@ -52,4 +52,10 @@ class BluetoothObd {
     final String data = await _channel.invokeMethod('getDistanceMILOn');
     return data;
   }
+
+  // get vin code
+  static Future<String> get getVinCode async {
+    final String data = await _channel.invokeMethod('getVINCode');
+    return data;
+  }
 }
