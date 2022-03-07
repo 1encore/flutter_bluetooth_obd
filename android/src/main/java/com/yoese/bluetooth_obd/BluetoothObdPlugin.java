@@ -22,6 +22,7 @@ import com.sohrab.obd.reader.obdCommand.ObdConfiguration;
 import com.sohrab.obd.reader.obdCommand.SpeedCommand;
 import com.sohrab.obd.reader.obdCommand.control.DistanceMILOnCommand;
 import com.sohrab.obd.reader.obdCommand.control.ModuleVoltageCommand;
+import com.sohrab.obd.reader.obdCommand.control.VinCommand;
 import com.sohrab.obd.reader.obdCommand.engine.LoadCommand;
 import com.sohrab.obd.reader.obdCommand.engine.MassAirFlowCommand;
 import com.sohrab.obd.reader.obdCommand.engine.RPMCommand;
@@ -49,6 +50,7 @@ public class BluetoothObdPlugin implements FlutterPlugin, MethodCallHandler {
   String obdEngineRpm;
   String obdModuleVoltage;
   String obdDistanceMILOn;
+  String vinCode;
   BroadcastReceiver mObdReaderReceiver;
   Intent obdIntent;
   String obdAction ;
@@ -79,6 +81,7 @@ public class BluetoothObdPlugin implements FlutterPlugin, MethodCallHandler {
       obdCommands.add(new AirIntakeTemperatureCommand()); //oil temp
       obdCommands.add(new MassAirFlowCommand()); //MAF
       obdCommands.add(new DistanceMILOnCommand()); //MIL distance
+      obdCommands.add(new VinCommand()); //VIN code
       ObdConfiguration.setmObdCommands(context, obdCommands);
 
       //Register receiver with some action related to OBD connection status and read PID values
@@ -229,7 +232,25 @@ public class BluetoothObdPlugin implements FlutterPlugin, MethodCallHandler {
         }
       }
       result.success("" + obdDistanceMILOn);
-    }else {
+    } else if (call.method.equals("getVINCode")) {
+      if (obdAction.equals(ACTION_READ_OBD_REAL_TIME_DATA)) {
+        TripRecord tripRecord = TripRecord.getTripRecode(context);
+        if (tripRecord.getmVehicleIdentificationNumber() != null) {
+          vinCode = String.valueOf(tripRecord.getmVehicleIdentificationNumber()); //display speed
+        }else{
+            vinCode = "no vin code signal";
+        }
+      }
+    } else if (call.method.equals("clearTroubleCodes")) {
+      if (obdAction.equals(ACTION_READ_OBD_REAL_TIME_DATA)) {
+        TripRecord tripRecord = TripRecord.getTripRecode(context);
+        if (tripRecord.getmVehicleIdentificationNumber() != null) {
+          vinCode = String.valueOf(tripRecord.getmVehicleIdentificationNumber()); //display speed
+        }else{
+          vinCode = "no vin code signal";
+        }
+      }
+    } else {
       result.notImplemented();
     }
   }
